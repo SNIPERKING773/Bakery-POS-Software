@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crumb &amp; Co · Bakery POS Admin</title>
+<style>
+:root{--bg:#f8f3ec;--sf:#fff;--ink:#2a2018;--mute:#6f6053;--line:#e9ded0;--br:#b24f1c;--brk:#fff;--ok:#237a48;--warn:#9a6200;--bad:#c0392b;--side:#2a2018;--sk:#f3e8da;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16110d;--sf:#211a14;--ink:#f3e8da;--mute:#b5a595;--line:#3a2f26;--br:#e8803f;--brk:#1a0f08;--ok:#5cc88a;--warn:#e8b04a;--bad:#ff8a7a;--side:#0f0b08;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16110d;--sf:#211a14;--ink:#f3e8da;--mute:#b5a595;--line:#3a2f26;--br:#e8803f;--brk:#1a0f08;--ok:#5cc88a;--warn:#e8b04a;--bad:#ff8a7a;--side:#0f0b08;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,.logo{font-family:"Iowan Old Style",Georgia,serif;margin:0;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--br);outline-offset:2px}
+.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+.side{background:var(--side);color:var(--sk);padding:20px 14px;position:sticky;top:0;align-self:start;height:100dvh;display:flex;flex-direction:column;gap:6px}
+.logo{font-size:22px;padding:4px 10px 18px;display:flex;gap:10px;align-items:center}
+.logo b{background:var(--br);color:var(--brk);width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:18px}
+.nv{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:10px;color:inherit;text-decoration:none;min-height:44px;opacity:.82}
+.nv:hover{background:#ffffff14;opacity:1}
+.nv.on{background:var(--br);color:var(--brk);opacity:1;font-weight:600}
+.sp{flex:1}
+.shift{font-size:13px;padding:12px;border-radius:10px;background:#ffffff12}
+main{padding:22px clamp(14px,3vw,32px) 40px;min-width:0}
+.top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.srch{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px;color:var(--mute)}
+.srch input{flex:1;border:0;background:none;color:var(--ink);font:inherit;min-width:0;outline:0}
+.srch:focus-within{border-color:var(--br);box-shadow:0 0 0 3px color-mix(in srgb,var(--br) 25%,transparent)}
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--sf);font-weight:600;transition:transform .1s,background .15s}
+.btn:hover{background:color-mix(in srgb,var(--br) 8%,var(--sf))}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--br);color:var(--brk);border-color:var(--br)}
+.btn.p:hover{background:color-mix(in srgb,var(--br) 88%,#000)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:9px}
+.btn:disabled{opacity:.6;cursor:default}
+.ib{position:relative;width:44px;padding:0}
+.dot{position:absolute;top:6px;right:6px;background:var(--bad);color:#fff;font-size:11px;border-radius:9px;min-width:18px;height:18px;display:grid;place-items:center;font-weight:700}
+.av{width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:clamp(26px,4vw,34px)}
+.mute{color:var(--mute)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12.5px;font-weight:600;background:color-mix(in srgb,var(--c,var(--mute)) 14%,var(--sf));color:var(--c,var(--mute))}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.ok{--c:var(--ok)}.warn{--c:var(--warn)}.bad{--c:var(--bad)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:14px}
+.card{background:var(--sf);border:1px solid var(--line);border-radius:var(--r,16px);padding:18px;min-width:0}
+.kpi .l{display:flex;justify-content:space-between;color:var(--mute);font-size:14px}
+.kpi .v{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;margin:6px 0 8px;letter-spacing:-.02em}
+.kpi.alert{border-color:color-mix(in srgb,var(--warn) 55%,var(--line))}
+.g{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+h2{font-size:19px}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:6px 14px;border-radius:7px;min-height:34px;color:var(--mute);font-weight:600}
+.seg button[aria-selected="true"]{background:var(--sf);color:var(--ink);box-shadow:0 1px 3px #0003}
+#bars,.bars{display:flex;gap:6px;height:210px;border-bottom:1px solid var(--line)}
+.bar{flex:1;display:grid;grid-template-rows:1fr auto;background:none;border:0;padding:0;min-width:0;border-radius:6px}
+.bar span{align-self:end;justify-self:center;width:72%;max-width:36px;height:var(--h);background:color-mix(in srgb,var(--br) 38%,var(--sf));border-radius:6px 6px 0 0;transition:height .35s,background .15s}
+.bar.pk span,.bar:hover span,.bar:focus-visible span{background:var(--br)}
+.bar i{font-style:normal;font-size:12px;color:var(--mute);padding-top:6px;transform:translateY(100%);height:0;overflow:visible}
+#rd{margin:30px 0 0;font-weight:600}
+.top5{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.top5 li{display:grid;gap:5px}
+.top5 .r{display:flex;justify-content:space-between;gap:8px}
+.tr{height:8px;background:var(--bg);border-radius:9px;overflow:hidden}
+.tr b{display:block;height:100%;background:var(--br);border-radius:9px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th{font-size:12.5px;text-align:left;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:0 10px 10px}
+td{padding:11px 10px;border-top:1px solid var(--line);vertical-align:middle}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.stk{display:grid;gap:16px}
+.stk .r{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stk .tr{margin-top:6px}
+.stk .tr b{background:var(--c)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90vw;font-weight:600}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.pos{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:14px;align-items:start}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.pt{text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:88px;display:grid;align-content:space-between;gap:6px;transition:.12s}
+.pt:hover{border-color:var(--br);transform:translateY(-2px)}
+.pt b{color:var(--br)}
+.pt[hidden]{display:none}
+.cl{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.q{display:inline-flex;align-items:center;gap:10px}
+.q button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--sf);font-size:18px}
+.tot{display:flex;justify-content:space-between;font-size:22px;font-weight:700;margin:14px 0;font-variant-numeric:tabular-nums}
+.m3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:14px}
+.fi{display:block;width:100%;min-height:44px;margin-top:6px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:0 12px;font:inherit}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:44px;border-top:1px solid var(--line)}
+.tg input{width:22px;height:22px;accent-color:var(--br)}
+.ov{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:16px;z-index:30;overflow:auto}
+.ov[hidden]{display:none}
+.rc{width:min(380px,100%);display:grid;gap:12px}
+.paper{background:#fffdf8;color:#2a2018;border-radius:8px;padding:24px 20px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;box-shadow:0 12px 40px #0006}
+.paper h3{font:700 22px Georgia,serif;text-align:center;margin:0}
+.paper .c{text-align:center}
+.paper hr{border:0;border-top:1px dashed #2a2018;margin:10px 0}
+.paper .ln{display:flex;justify-content:space-between;gap:10px}
+.paper .b{font-weight:700;font-size:16px;margin:4px 0}
+.rb{display:flex;gap:10px}.rb .btn{flex:1}
+.term{background:#1f2933;color:#fff;border-radius:22px;padding:18px;display:grid;gap:14px;box-shadow:0 12px 40px #0008}
+.term .ln{display:flex;justify-content:space-between;font-size:14px;opacity:.9}
+.lcd{background:#cfe8d5;color:#10261a;border-radius:12px;padding:18px 16px;text-align:center;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;min-height:150px;display:grid;align-content:center;gap:8px}
+.lcd .amt{font-size:30px;font-weight:700}
+.lcd label{text-align:left;font-size:13px}
+.term .btn{background:#2f3e4c;color:#fff;border-color:#43566a}
+.term .btn.p{background:var(--br);color:var(--brk);border-color:var(--br)}
+.np{position:fixed;width:min(380px,calc(100vw - 28px));background:var(--sf);border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 48px #0005;z-index:25;padding:8px;max-height:70vh;overflow:auto}
+.ni{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;text-decoration:none;color:inherit;min-height:44px}
+.ni:hover{background:color-mix(in srgb,var(--br) 8%,var(--sf))}
+.ni .d{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none;background:var(--c)}
+.ni.rd .d{visibility:hidden}.ni.rd{opacity:.7}
+.ni small{color:var(--mute)}
+.dot[hidden]{display:none}
+.lg{position:fixed;inset:0;z-index:40;background:var(--bg);display:grid;place-items:center;padding:16px;overflow:auto}
+.lg[hidden]{display:none}
+.lc{width:min(400px,100%);display:grid;gap:14px;padding:28px 24px;box-shadow:0 12px 40px #0002}
+.lc label{font-size:14px;font-weight:600}
+.pw{display:flex;gap:8px}.pw .btn{margin-top:6px;min-height:44px}
+.le{color:var(--bad);min-height:1.4em;margin:0;font-size:14px;font-weight:600}
+.nv[hidden]{display:none}
+body.emp .mg{display:none}
+@media print{body *{visibility:hidden}#rc .paper,#rc .paper *{visibility:visible}#rc{position:absolute;left:0;top:0;background:none;padding:0;display:block}#rc .paper{box-shadow:none}}
+@media(max-width:900px){
+.app{grid-template-columns:1fr}
+.side{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:10px;gap:4px;align-items:center}
+.logo{padding:0 10px 0 4px}.logo span,.shift,.sp{display:none}
+.nv{white-space:nowrap}
+.g,.pos{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="g" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></symbol>
+<symbol id="c" viewBox="0 0 24 24"><path d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.2a1 1 0 0 0 1-.8L19 8H6"/><circle cx="9" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/></symbol>
+<symbol id="b" viewBox="0 0 24 24"><path d="M3 8l9-5 9 5v8l-9 5-9-5zM3 8l9 5 9-5M12 13v8"/></symbol>
+<symbol id="r" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></symbol>
+<symbol id="u" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5a3 3 0 0 1 0 6M18 14c2 .6 3 2.6 3 6"/></symbol>
+<symbol id="h" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 16v-5M13 16V8M18 16v-3"/></symbol>
+<symbol id="s" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+<symbol id="n" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></symbol>
+<symbol id="q" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></symbol>
+<symbol id="p" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="m" viewBox="0 0 24 24"><path d="M20 14A8 8 0 0 1 10 4a8 8 0 1 0 10 10z"/></symbol>
+</defs></svg>
+
+<div id="lg" class="lg" hidden>
+<form class="lc card" id="lf">
+<div class="logo" style="justify-content:center;padding:0"><b aria-hidden="true">C</b><span>Crumb &amp; Co</span></div>
+<h1 style="font-size:26px;text-align:center">Welcome back</h1>
+<p class="mute" style="text-align:center;margin:-6px 0 0">Sign in to your bakery workspace</p>
+<div class="seg" id="rl" role="tablist" aria-label="Sign in as" style="display:flex"><button type="button" role="tab" aria-selected="true" data-r="manager" style="flex:1">Manager</button><button type="button" role="tab" aria-selected="false" data-r="employee" style="flex:1">Employee</button></div>
+<label>Username<input class="fi" id="lu" autocomplete="username" required></label>
+<label>Password<span class="pw"><input class="fi" id="lpw" type="password" autocomplete="current-password" required><button type="button" class="btn sm" id="eye" aria-label="Show or hide password">Show</button></span></label>
+<p class="le" id="le" role="alert"></p>
+<button class="btn p" style="width:100%">Sign in as Manager</button>
+<p class="mute" style="font-size:13px;text-align:center;margin:0">Demo: <b>manager</b> / <b>crumb123</b> · <b>staff</b> / <b>crumb123</b></p>
+</form></div>
+<div class="app">
+<aside class="side">
+  <div class="logo"><b aria-hidden="true">C</b><span>Crumb &amp; Co</span></div>
+  <nav style="display:contents" aria-label="Main">
+    <a href="#" class="nv on" aria-current="page"><svg class="i"><use href="#g"/></svg>Dashboard</a>
+    <a href="#" class="nv"><svg class="i"><use href="#c"/></svg>Point of sale</a>
+    <a href="#" class="nv"><svg class="i"><use href="#r"/></svg>Orders</a>
+    <a href="#" class="nv"><svg class="i"><use href="#b"/></svg>Inventory</a>
+    <a href="#" class="nv"><svg class="i"><use href="#u"/></svg>Customers</a>
+    <a href="#" class="nv"><svg class="i"><use href="#h"/></svg>Reports</a>
+    <a href="#" class="nv"><svg class="i"><use href="#s"/></svg>Settings</a>
+  </nav>
+  <div class="sp"></div>
+  <div class="shift"><strong>Shift open</strong><br>Since 6:00 AM · 3 staff on duty</div>
+</aside>
+
+<main>
+  <div class="top">
+    <label class="srch"><svg class="i"><use href="#q"/></svg><input type="search" placeholder="Search orders, products, customers" aria-label="Search"></label>
+    <button class="btn p" data-go="pos"><svg class="i"><use href="#p"/></svg>New sale</button>
+    <button class="btn ib" aria-label="Notifications, 3 unread" id="bell" aria-haspopup="dialog" aria-expanded="false"><svg class="i"><use href="#n"/></svg><span class="dot">3</span></button>
+    <button class="btn ib" id="theme" aria-label="Toggle dark mode"><svg class="i"><use href="#m"/></svg></button>
+    <button class="btn" id="out">Sign out</button><div class="av"></div>
+  </div>
+
+  <div id="v-dash"><div class="head">
+    <div><h1>Good morning, Amaka</h1><p class="mute" style="margin:4px 0 0">Wednesday, 28 October 2026 · Main Branch</p></div>
+    <span class="chip ok">Shop open · 128 orders so far</span>
+  </div>
+
+  <section class="kpis mg" aria-label="Key figures">
+    <div class="card kpi"><div class="l">Today’s sales<svg class="i"><use href="#h"/></svg></div><div class="v">₦486,000</div><span class="chip ok">▲ 12.4% vs yesterday</span></div>
+    <div class="card kpi"><div class="l">Orders<svg class="i"><use href="#r"/></svg></div><div class="v">128</div><span class="chip ok">▲ 8 more than yesterday</span></div>
+    <div class="card kpi"><div class="l">Average basket<svg class="i"><use href="#c"/></svg></div><div class="v">₦3,800</div><span class="chip bad">▼ 2.1% vs yesterday</span></div>
+    <div class="card kpi alert"><div class="l">Low stock<svg class="i"><use href="#b"/></svg></div><div class="v">4 items</div><span class="chip warn">Needs restocking today</span></div>
+  </section>
+
+  <div class="g mg">
+    <section class="card" aria-labelledby="ch1">
+      <div class="ch"><h2 id="ch1">Sales trend</h2>
+        <div class="seg" role="tablist" aria-label="Chart range"><button role="tab" aria-selected="true" data-k="today">Today</button><button role="tab" aria-selected="false" data-k="week">7 days</button></div></div>
+      <div id="bars"></div>
+      <p id="rd" aria-live="polite"></p>
+    </section>
+    <section class="card" aria-labelledby="ch2">
+      <div class="ch"><h2 id="ch2">Best sellers today</h2></div>
+      <ol class="top5" id="top"></ol>
+    </section>
+  </div>
+
+  <div class="g">
+    <section class="card" aria-labelledby="ch3">
+      <div class="ch"><h2 id="ch3">Live orders</h2><a class="btn sm" href="#orders" style="text-decoration:none;color:inherit">View all</a></div>
+      <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th class="n">Items</th><th class="n">Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="ord"></tbody></table></div>
+    </section>
+    <section class="card" aria-labelledby="ch4">
+      <div class="ch"><h2 id="ch4">Stock alerts</h2></div>
+      <div class="stk" id="stk"></div>
+    </section>
+  </div>
+</div><div id="v-other" hidden></div>
+</main>
+</div>
+<div id="py" class="ov" hidden role="dialog" aria-modal="true" aria-label="POS payment"><div class="rc" id="pyb"></div></div>
+<div id="np" class="np" hidden role="dialog" aria-label="Notifications"></div>
+<div id="rc" class="ov" hidden role="dialog" aria-modal="true" aria-label="Receipt preview"><div class="rc"><div class="paper" id="rcp"></div><div class="rb"><button class="btn" data-c="1">Close</button><button class="btn p" id="rpr"><svg class="i"><use href="#r"/></svg>Print receipt</button></div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s),N=n=>'₦'+n.toLocaleString('en-NG');
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2400)}
+
+const D={today:{l:['6a','7a','8a','9a','10a','11a','12p','1p','2p','3p','4p','5p'],v:[18,42,61,55,72,48,39,44,31,36,28,12]},
+week:{l:['Thu','Fri','Sat','Sun','Mon','Tue','Wed'],v:[455,512,703,648,402,431,486]}};
+let cur='today';
+function show(i){const d=D[cur],m=Math.max(...d.v);$('#rd').textContent=d.l[i]+' · '+N(d.v[i]*1000)+(d.v[i]==m?' · Peak':'')}
+function chart(k){cur=k;const d=D[k],m=Math.max(...d.v);
+$('#bars').innerHTML=d.v.map((v,i)=>`<button class="bar${v==m?' pk':''}" style="--h:${v/m*100}%" data-i="${i}" aria-label="${d.l[i]}: ${N(v*1000)}"><span></span><i>${d.l[i]}</i></button>`).join('');
+show(d.v.indexOf(m))}
+$('#bars').addEventListener('mouseover',e=>{const b=e.target.closest('.bar');b&&show(b.dataset.i)});
+$('#bars').addEventListener('focusin',e=>{const b=e.target.closest('.bar');b&&show(b.dataset.i)});
+document.querySelectorAll('#v-dash .seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#v-dash .seg button').forEach(x=>x.setAttribute('aria-selected',x==b));chart(b.dataset.k)});
+
+const T=[['Butter croissant',214],['Meat pie',187],['Sourdough loaf',96],['Chin chin pack',88],['Zobo drink',74]];
+$('#top').innerHTML=T.map(([n,q])=>`<li><div class="r"><span>${n}</span><strong>${q} sold</strong></div><div class="tr"><b style="width:${q/T[0][1]*100}%"></b></div></li>`).join('');
+
+const S=[['Preparing','warn','Mark ready'],['Ready','ok','Hand over'],['Completed','','View receipt']];
+const O=[{id:1048,c:'Walk-in',n:3,t:4500,s:0},{id:1047,c:'Online · Chioma',n:6,t:12800,s:1},{id:1046,c:'Walk-in',n:2,t:1900,s:2},{id:1045,c:'Pre-order · Corporate',n:24,t:96000,s:0},{id:1044,c:'Walk-in',n:1,t:700,s:2},{id:1043,c:'Online · Tunde',n:4,t:7600,s:2},{id:1042,c:'Walk-in',n:5,t:6200,s:2},{id:1041,c:'Pre-order · Church group',n:40,t:148000,s:2}];
+function orders(){$('#ord').innerHTML=O.slice(0,5).map((o,i)=>`<tr><td><strong>#${o.id}</strong></td><td>${o.c}</td><td class="n">${o.n}</td><td class="n">${N(o.t)}</td><td><span class="chip ${S[o.s][1]}">${S[o.s][0]}</span></td><td><button class="btn sm" data-o="${i}">${S[o.s][2]}</button></td></tr>`).join('')}
+$('#ord').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const o=O[b.dataset.o];
+if(o.s<2){o.s++;toast('Order #'+o.id+' is now '+S[o.s][0].toLowerCase());orders()}else receipt(o)});
+
+const K=[['Flour (50 kg bags)',3,20],['Butter (kg)',4,15],['Dry yeast (packs)',6,12],['Cake boxes, medium',45,200],['Sugar (25 kg bags)',18,25],['Eggs (trays)',22,30],['Milk (litres)',40,50],['Cocoa powder (kg)',9,10]];
+function stock(){$('#stk').innerHTML=K.filter(k=>k[1]/k[2]<.5).map(([n,q,p,d],i)=>{const r=q/p,c=r<.3?'bad':'warn';return `<div><div class="r"><div><strong>${n}</strong><br><span class="chip ${c}">${q} left · ${r<.3?'Critical':'Low'}</span></div><button class="btn sm" data-k="${i}" ${d?'disabled':''}>${d?'Requested ✓':'Restock'}</button></div><div class="tr ${c}"><b style="width:${r*100}%"></b></div></div>`}).join('')}
+$('#stk').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;K[b.dataset.k][3]=1;toast('Restock request sent to supplier');stock()});
+
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>toast(b.dataset.t));
+/* ---- pages ---- */
+const H=['dashboard','pos','orders','inventory','customers','reports','preferences'],VW={},P=[['Butter croissant',700,'Pastries'],['Meat pie',800,'Pastries'],['Doughnut',500,'Pastries'],['Sourdough loaf',2800,'Breads'],['Agege bread',1200,'Breads'],['Chin chin pack',1000,'Snacks'],['Zobo drink',600,'Drinks'],['Iced coffee',1500,'Drinks'],
+['Chicken pie',900,'Pastries'],['Sausage roll',600,'Pastries'],['Fish roll',500,'Pastries'],['Egg roll',700,'Pastries'],['Cinnamon roll',1000,'Pastries'],['Chocolate muffin',800,'Pastries'],['Red velvet slice',1800,'Pastries'],['Apple turnover',900,'Pastries'],
+['Sliced white loaf',1500,'Breads'],['Brown wheat loaf',1800,'Breads'],['Butter bread',1400,'Breads'],['Coconut bread',1600,'Breads'],['Banana bread',2200,'Breads'],['Baguette',1300,'Breads'],['Garlic bread',1100,'Breads'],['Burger buns (6)',1500,'Breads'],
+['Puff puff (6 pcs)',600,'Snacks'],['Samosa (4 pcs)',1000,'Snacks'],['Spring rolls (4 pcs)',1200,'Snacks'],['Butter cookies',1200,'Snacks'],['Plantain chips',700,'Snacks'],['Groundnut pack',500,'Snacks'],['Coconut candy',400,'Snacks'],
+['Bottled water',300,'Drinks'],['Fresh orange juice',1200,'Drinks'],['Chapman',1500,'Drinks'],['Hot coffee',1200,'Drinks'],['Hot chocolate',1300,'Drinks'],['Milk tea',1000,'Drinks'],['Soft drink',500,'Drinks'],['Malt drink',700,'Drinks'],['Fruit smoothie',2000,'Drinks']],
+CU=[['Chioma Eze',42,168000,'Today','VIP'],['Tunde Bello',31,121500,'Yesterday','VIP'],['Zenith Events',9,412000,'Tuesday','VIP'],['Hadiza Musa',18,64200,'Monday','Regular'],['Ngozi Okafor',5,17800,'Saturday','Regular'],['Samuel Ade',1,3500,'Today','New']],
+R={Week:{c:[['Pastries',46],['Breads',31],['Drinks',14],['Snacks',9]],pay:[['Transfer',44],['Cash',38],['Card',18]],tot:3076,ord:812},Month:{c:[['Pastries',44],['Breads',33],['Drinks',13],['Snacks',10]],pay:[['Transfer',46],['Cash',35],['Card',19]],tot:12840,ord:3390}};
+let V='dashboard',pc='All',C={},pm='Cash',of='All',rp='Week',nid=1049;
+const seg=(a,c,k)=>`<div class="seg">${a.map(x=>`<button aria-selected="${x==c}" data-a="${k}" data-x="${x}">${x}</button>`).join('')}</div>`;
+const hd=(t,s,r='')=>`<div class="head"><div><h1>${t}</h1><p class="mute" style="margin:4px 0 0">${s}</p></div>${r}</div>`;
+const kp=(l,v,c)=>`<div class="card kpi"><div class="l">${l}</div><div class="v">${v}</div>${c?`<span class="chip ok">${c}</span>`:''}</div>`;
+
+VW.pos=()=>{const ls=Object.entries(C),t=ls.reduce((s,[i,q])=>s+P[i][1]*q,0);
+return hd('Point of sale','Tap a product to add it to the current sale')+`<div class="pos"><section class="card">${seg(['All','Pastries','Breads','Snacks','Drinks'],pc,'cat')}<input class="fi" id="pq" type="search" placeholder="Search products" aria-label="Search products" value="${pq.replace(/[&<>"]/g,'')}" style="margin:14px 0 0"><div class="pg" style="margin-top:14px">${P.map((p,i)=>[p,i]).sort((a,b)=>'PBSD'.indexOf(a[0][2][0])-'PBSD'.indexOf(b[0][2][0])).map(([p,i])=>(pc=='All'||p[2]==pc)&&p[0].toLowerCase().includes(pq)?`<button class="pt" data-a="add" data-x="${i}"><span>${p[0]}</span><b>${N(p[1])}</b></button>`:'').join('')}</div></section>
+<section class="card"><h2>Current sale</h2>${ls.length?ls.map(([i,q])=>`<div class="cl"><span>${P[i][0]}<br><span class="mute">${N(P[i][1]*q)}</span></span><span class="q"><button data-a="dec" data-x="${i}" aria-label="Remove one ${P[i][0]}">−</button><strong>${q}</strong><button data-a="add" data-x="${i}" aria-label="Add one ${P[i][0]}">+</button></span></div>`).join(''):'<p class="mute">No items yet. Pick something from the left.</p>'}<div class="tot"><span>Total</span><span>${N(t)}</span></div>${seg(['Cash','Card','Transfer'],pm,'pay')}<button class="btn p" style="width:100%;margin-top:14px" data-a="charge" ${ls.length?'':'disabled'}>Charge ${N(t)}</button></section></div>`};
+
+VW.orders=()=>hd('Orders','Showing the latest '+O.length+' of 128 orders today',seg(['All','Preparing','Ready','Completed'],of,'of'))+`<section class="card"><div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th class="n">Items</th><th class="n">Total</th><th>Status</th><th>Action</th></tr></thead><tbody>${O.map((o,i)=>[o,i]).filter(([o])=>of=='All'||S[o.s][0]==of).map(([o,i])=>`<tr><td><strong>#${o.id}</strong></td><td>${o.c}</td><td class="n">${o.n}</td><td class="n">${N(o.t)}</td><td><span class="chip ${S[o.s][1]}">${S[o.s][0]}</span></td><td><button class="btn sm" data-a="adv" data-x="${i}">${S[o.s][2]}</button></td></tr>`).join('')}</tbody></table></div></section>`;
+
+VW.inventory=()=>hd('Inventory',K.length+' tracked items · '+K.filter(k=>k[1]/k[2]<.5).length+' need attention')+`<section class="card"><div class="tw"><table><thead><tr><th>Item</th><th>Stock level</th><th class="n">On hand</th><th class="n">Par</th><th>Status</th><th>Action</th></tr></thead><tbody>${K.map(([n,q,p,d],i)=>{const r=q/p,c=r<.3?'bad':r<.5?'warn':'ok';return `<tr><td><strong>${n}</strong></td><td style="min-width:110px"><div class="tr ${c}"><b style="width:${r*100}%;background:var(--c)"></b></div></td><td class="n">${q}</td><td class="n">${p}</td><td><span class="chip ${c}">${r<.3?'Critical':r<.5?'Low':'In stock'}</span></td><td><button class="btn sm" data-a="rs" data-x="${i}" ${d?'disabled':''}>${d?'Requested ✓':'Restock'}</button></td></tr>`}).join('')}</tbody></table></div></section>`;
+
+VW.customers=()=>hd('Customers','Know who keeps coming back')+`<div class="m3">${kp('Total customers','1,284','▲ 36 new this week')}${kp('Repeat customers','64%','▲ 3% vs last month')}${kp('VIP customers','87')}</div><section class="card"><div class="tw"><table><thead><tr><th>Customer</th><th class="n">Orders</th><th class="n">Spent</th><th>Last order</th><th>Tier</th><th>Action</th></tr></thead><tbody>${CU.map(([n,o,s,l,t])=>`<tr><td><strong>${n}</strong></td><td class="n">${o}</td><td class="n">${N(s)}</td><td>${l}</td><td><span class="chip ${t=='New'?'ok':''}" ${t=='VIP'?'style="--c:var(--br)"':''}>${t}</span></td><td><button class="btn sm" data-a="offer" data-x="${n.split(' ')[0]}">Send offer</button></td></tr>`).join('')}</tbody></table></div></section>`;
+
+VW.reports=()=>{const r=R[rp],m=[9.8,10.4,11.2,10.9,12.1,12.8],lb=['May','Jun','Jul','Aug','Sep','Oct'],
+li=a=>`<ol class="top5">${a.map(([n,p])=>`<li><div class="r"><span>${n}</span><strong>${p}%</strong></div><div class="tr"><b style="width:${p}%"></b></div></li>`).join('')}</ol>`;
+return hd('Reports','Revenue, categories and payment mix',seg(['Week','Month'],rp,'rp'))+`<div class="m3">${kp('Revenue','₦'+(r.tot/1000).toFixed(2)+'M')}${kp('Orders',r.ord.toLocaleString())}${kp('Average basket',N(Math.round(r.tot*1000/r.ord)))}</div>
+<div class="g"><section class="card"><h2 class="ch">Monthly revenue (₦ millions)</h2><div class="bars" style="margin-bottom:44px">${m.map((v,i)=>`<div class="bar${i==5?' pk':''}" style="--h:${v/12.8*100}%"><span></span><i>${lb[i]}<br>${v}</i></div>`).join('')}</div></section><section class="card"><h2 class="ch">Revenue by category</h2>${li(r.c)}<h2 class="ch" style="margin-top:22px">How customers pay</h2>${li(r.pay)}</section></div>`};
+
+VW.preferences=()=>hd('Settings','Shop details and preferences')+`<section class="card" style="max-width:640px;display:grid;gap:14px"><label>Shop name<input class="fi" value="Crumb &amp; Co · Main Branch"></label><label>Low-stock alert at (% of par level)<input class="fi" type="number" value="30" min="5" max="90"></label>${[['Charge 7.5% VAT on sales',1],['Print a receipt after each sale',1],['Email me the daily sales summary',0]].map(([t,c])=>`<label class="tg">${t}<input type="checkbox" ${c?'checked':''}></label>`).join('')}<button class="btn p" data-a="save" style="justify-self:start">Save changes</button></section>`;
+
+/* ---- receipt preview ---- */
+const rc=$('#rc'),g=(i,q)=>[P[i][0],q,P[i][1]],RI={1048:[g(3,1),g(4,1),g(2,1)],1047:[g(3,4),g(1,2)],1046:[g(0,1),g(4,1)],1045:[['Celebration cake',6,6000],['Party snack box',8,4000],g(3,10)],1044:[g(0,1)],1043:[g(3,2),g(1,1),g(4,1)],1042:[g(3,1),g(7,1),g(1,1),g(6,1),g(2,1)],1041:[['Party snack box',20,4000],['Celebration cake',8,6000],g(7,8),g(3,2),g(4,2)]};
+let lf,ro;
+function receipt(o){ro=o;const L=o.l||RI[o.id]||[],pay=o.p||(o.c.startsWith('Online')?'Card':o.c.startsWith('Pre')?'Transfer':'Cash'),tm=o.tm||(9+Math.floor((o.id-1041)/3))+':'+String(o.id*7%60).padStart(2,'0')+' AM';
+$('#rcp').innerHTML=`<h3>Crumb &amp; Co</h3><div class="c">Main Branch</div><hr><div class="ln"><span>Receipt #${o.id}</span><span>${tm}</span></div><div>Wed, 28 Oct 2026</div><div>Customer: ${o.c}</div>${o.by?`<div>Cashier: ${o.by}</div>`:''}<hr>${L.map(([n,q,p])=>`<div class="ln"><span>${q} × ${n}</span><span>${N(q*p)}</span></div>`).join('')}<hr><div class="ln"><span>VAT (7.5% incl.)</span><span>${N(Math.round(o.t*.075/1.075))}</span></div><div class="ln b"><span>TOTAL</span><span>${N(o.t)}</span></div><div class="ln"><span>Paid by</span><span>${pay}</span></div>${o.ref?`<div class="ln"><span>${o.ref[0]}</span><span>${o.ref[1]}</span></div>`:''}<hr><div class="c">Thank you for choosing<br>Crumb &amp; Co!</div>`;
+lf=document.activeElement;rc.hidden=false;$('#rpr').focus()}
+function closeR(){rc.hidden=true;lf&&lf.focus&&lf.focus()}
+rc.addEventListener('click',e=>{if(e.target==rc||e.target.dataset.c)closeR()});
+addEventListener('keydown',e=>{if(e.key=='Escape'&&!rc.hidden)closeR()});
+$('#rpr').onclick=()=>{const id=ro.id;try{print()}catch(x){}closeR();toast('Receipt #'+id+' sent to printer')};
+
+/* ---- POS terminal payment ---- */
+const tot=()=>Object.entries(C).reduce((s,[i,q])=>s+P[i][1]*q,0);
+let pk=0,ps=0,rf='',pq='';
+function payOpen(){if(!tot())return;ps=0;pk++;rf=String(10000+Math.floor(Math.random()*89999));lf=document.activeElement;$('#py').hidden=false;payDraw()}
+function closePay(){pk++;$('#py').hidden=true;lf&&lf.focus&&lf.focus()}
+function finish(ref){const ls=Object.entries(C),t=tot();if(!t)return;O.unshift({id:nid,c:'Walk-in · '+pm,n:ls.reduce((s,[,q])=>s+q,0),t,s:0,p:pm,by:U.n,ref,l:ls.map(([i,q])=>g(i,q)),tm:new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'})});toast('Payment received · order #'+nid);nid++;C={};orders();closePay();draw();receipt(O[0])}
+function payDraw(){const t=tot(),k=pk;let m,b='';
+if(pm=='Cash'){m=`<div>Amount due</div><div class="amt">${N(t)}</div><label>Cash received<input class="fi" id="cr" type="number" inputmode="numeric" min="0" placeholder="₦0"></label><div id="chg">Enter the amount received</div>`;b='<button class="btn p" id="pk" disabled>Confirm cash</button>'}
+else if(pm=='Card'){m=ps==0?`<div>Amount due</div><div class="amt">${N(t)}</div><div>Insert, tap or swipe card</div>`:ps==1?`<div class="amt">Processing…</div><div>Please do not remove card</div>`:`<div class="amt">APPROVED ✓</div><div>Card ref ${rf}</div>`;b=ps==0?'<button class="btn p" id="pk">Card tapped (demo)</button>':''}
+else{m=`<div>Transfer ${N(t)} to</div><div class="amt" style="font-size:22px">0123456789</div><div>Crumb &amp; Co · Demo Bank</div>`;b='<button class="btn p" id="pk">Transfer received</button>'}
+$('#pyb').innerHTML=`<div class="term"><div class="ln"><strong>POS terminal</strong><span>${pm}</span></div><div class="lcd">${m}</div><div class="rb"><button class="btn" id="pc" ${ps==2?'disabled':''}>Cancel</button>${b}</div></div>`;
+$('#pc').onclick=closePay;const pb=$('#pk');if(!pb)return;
+if(pm=='Cash'){const ci=$('#cr');ci.focus();ci.oninput=()=>{const v=+ci.value,ok=v>=t;pb.disabled=!ok;$('#chg').textContent=ok?'Change: '+N(v-t):'Short by '+N(t-v)};pb.onclick=()=>finish(['Change',N(+ci.value-t)])}
+else if(pm=='Card')pb.onclick=()=>{ps=1;payDraw();setTimeout(()=>{if(k!=pk)return;ps=2;payDraw();setTimeout(()=>{if(k==pk)finish(['Card ref',rf])},900)},1400)};
+else pb.onclick=()=>finish(['Transfer ref','TRF'+rf])}
+addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('#py').hidden&&ps!=2)closePay()});
+$('#v-other').addEventListener('input',e=>{if(e.target.id!='pq')return;pq=e.target.value.trim().toLowerCase();document.querySelectorAll('.pt').forEach(b=>b.hidden=!b.textContent.toLowerCase().includes(pq))});
+
+/* ---- alerts bell ---- */
+const NT=[{t:'Flour is critically low',s:'Only 3 bags left · 12 min ago',h:'inventory',c:'bad',u:1},{t:'Order #1047 is ready for pickup',s:'Online · Chioma · 25 min ago',h:'orders',c:'ok',u:1},{t:'Corporate pre-order #1045 is due at 2:00 PM',s:'24 items · 1 hour ago',h:'orders',c:'warn',u:1}],np=$('#np'),bell=$('#bell');
+function nDraw(){const n=NT.filter(x=>x.u).length;
+np.innerHTML=`<div class="ch" style="padding:8px 12px 4px;margin:0"><h2>Alerts</h2><button class="btn sm" data-r="1" ${n?'':'disabled'}>Mark all read</button></div>${NT.map((x,i)=>`<a class="ni ${x.c}${x.u?'':' rd'}" href="#${x.h}" data-n="${i}"><span class="d"></span><span><strong>${x.t}</strong><br><small>${x.s}</small></span></a>`).join('')}`;
+const d=bell.querySelector('.dot');d.hidden=!n;d.textContent=n;bell.setAttribute('aria-label',n?'Notifications, '+n+' unread':'Notifications, none unread')}
+function nOpen(){nDraw();const r=bell.getBoundingClientRect();np.style.top=(r.bottom+8)+'px';np.style.right=Math.max(14,innerWidth-r.right)+'px';np.hidden=false;bell.setAttribute('aria-expanded','true')}
+function closeN(){if(np.hidden)return;np.hidden=true;bell.setAttribute('aria-expanded','false')}
+bell.onclick=()=>np.hidden?nOpen():closeN();
+np.addEventListener('click',e=>{const a=e.target.closest('[data-n]');
+if(e.target.closest('[data-r]')){NT.forEach(x=>x.u=0);nDraw();toast('All alerts marked as read')}
+else if(a){e.preventDefault();NT[a.dataset.n].u=0;nDraw();closeN();location.hash=a.getAttribute('href').slice(1)}});
+document.addEventListener('click',e=>{if(!np.contains(e.target)&&!bell.contains(e.target))closeN()});
+addEventListener('keydown',e=>{if(e.key=='Escape')closeN()});
+addEventListener('scroll',closeN,{passive:true});
+nDraw();
+
+function draw(){const o=$('#v-other');o.hidden=V=='dashboard';if(V!='dashboard')o.innerHTML=VW[V]()}
+function route(){const h=location.hash.slice(1);V=H.includes(h)?h:'dashboard';if(U&&U.r=='Employee'&&MG.includes(H.indexOf(V)))V='dashboard';
+document.querySelectorAll('.nv').forEach((a,i)=>{const on=H[i]==V;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
+$('#v-dash').hidden=V!='dashboard';draw();scrollTo(0,0)}
+document.querySelectorAll('.nv').forEach((a,i)=>a.href='#'+H[i]);
+addEventListener('hashchange',route);
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{location.hash=b.dataset.go});
+$('#v-other').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,x=b.dataset.x;
+if(a=='cat')pc=x;else if(a=='pay')pm=x;else if(a=='of')of=x;else if(a=='rp')rp=x;
+else if(a=='add')C[x]=(C[x]||0)+1;
+else if(a=='dec'){C[x]--;if(C[x]<1)delete C[x]}
+else if(a=='charge'){payOpen();return}
+else if(a=='adv'){const o=O[x];if(o.s<2){o.s++;toast('Order #'+o.id+' is now '+S[o.s][0].toLowerCase())}else receipt(o);orders()}
+else if(a=='rs'){K[x][3]=1;toast('Restock request sent to supplier');stock()}
+else if(a=='offer')toast('Offer sent to '+x);
+else if(a=='save'){toast('Settings saved');return}
+draw()});
+$('#theme').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'};
+/* ---- login and roles ---- */
+const AC={manager:{u:'manager',p:'crumb123',n:'Amaka O.',i:'AO',r:'Manager'},employee:{u:'staff',p:'crumb123',n:'Tunde B.',i:'TB',r:'Employee'}},MG=[3,4,5,6],lg=$('#lg');
+let U=null,lr='manager';
+function setRole(r){lr=r;document.querySelectorAll('#rl button').forEach(b=>b.setAttribute('aria-selected',b.dataset.r==r));$('#lf .btn.p').textContent='Sign in as '+AC[r].r;$('#le').textContent=''}
+document.querySelectorAll('#rl button').forEach(b=>b.onclick=()=>setRole(b.dataset.r));
+$('#eye').onclick=()=>{const p=$('#lpw'),s=p.type=='password';p.type=s?'text':'password';$('#eye').textContent=s?'Hide':'Show'};
+$('#lf').onsubmit=e=>{e.preventDefault();const a=AC[lr];
+if($('#lu').value.trim().toLowerCase()==a.u&&$('#lpw').value==a.p)login(a);else{$('#le').textContent='Wrong username or password for '+a.r+'. Please try again.';$('#lpw').select()}};
+function login(a){U=a;const emp=a.r=='Employee',av=$('.av');document.body.classList.toggle('emp',emp);lg.hidden=true;$('.app').inert=false;
+av.textContent=a.i;av.title=a.n+', '+a.r;av.setAttribute('aria-label',a.n+', '+a.r);
+$('.shift').innerHTML='<strong>'+a.n+'</strong><br>'+a.r+' · Shift open since 6:00 AM';
+$('#v-dash h1').textContent='Good morning, '+a.n.split(' ')[0];
+document.querySelectorAll('.nv').forEach((n,i)=>n.hidden=emp&&MG.includes(i));
+location.hash='dashboard';route();toast('Signed in as '+a.n+' ('+a.r+')')}
+$('#out').onclick=()=>{U=null;C={};closeN();$('.app').inert=true;lg.hidden=false;$('#lu').value='';$('#lpw').value='';setRole('manager');$('#lu').focus()};
+
+chart('today');orders();stock();route();$('.app').inert=true;lg.hidden=false;$('#lu').focus();
+</script>
+</body>
+</html>
